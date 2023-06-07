@@ -21,15 +21,20 @@ const PARAMS = {
     spacesMembersCreate: 'https://chat.googleapis.com/v1'
   },
   sheets: {
-    review: { name: 'Application review', dataRow: 3, colTimeStamp: 1, colEmail: 2, colSpace: 3, colCheck: 5, colLog: 6 },
-    settings: { name: 'Settings', colFormItem: 1, colFormSpaceName: 2, colSpaceName: 1, colSpaceId: 3, formSpaceTable: 'A3:B', spaceTable: 'D3:F' },
+    review: {
+      name: 'Application review', dataRow: 3, colTimeStamp: 1, colEmail: 2, colSpace: 3, colCheck: 5, colLog: 6
+    },
+    settings: {
+      name: 'Settings',
+      formSpaceTable: 'A3:B', colFormItem: 1, colFormSpaceName: 2,
+      spaceTable: 'D3:F', colSpaceName: 1, colSpaceId: 3,
+    },
   },
   buttons: {
     leds: { process: 'H2', reload: 'C5' },
     status: { on: '🟢', off: '⚪' }
   },
   chatSpaceDescriptionMaxLength: 60,
-
 };
 
 /**

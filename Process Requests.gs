@@ -70,7 +70,7 @@ function processRequests() {
               
               if (response.getResponseCode() != 200) array[index][PARAMS.sheets.review.colLog - 1] = `Can't add user to space!`;
               else {
-                // Uncheck request and write timestamp in log
+                // Unchecks request and write timestamp in log
                 usersAdded++;
                 array[index][PARAMS.sheets.review.colCheck -1] = false;
                 array[index][PARAMS.sheets.review.colLog - 1] =  Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
