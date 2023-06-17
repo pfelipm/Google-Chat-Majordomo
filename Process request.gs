@@ -1,5 +1,5 @@
 /**
- * Adds users to Chat spaces, if granted access.
+ * Adds users to chat spaces, if granted access.
  */
 function processRequests() {
 
@@ -7,13 +7,12 @@ function processRequests() {
   const lock = LockService.getScriptLock()
   if (lock.tryLock(0)) {
 
-    const ss = SpreadsheetApp.getActive()
+    const ss = SpreadsheetApp.getActive();
     const s = ss.getSheetByName(PARAMS.sheets.review.name);
     let usersAdded = 0;
 
     const requests = s.getDataRange().getValues().slice(PARAMS.sheets.review.dataRow - 1);
     const numRequests = requests.filter(row => row[PARAMS.sheets.review.colTimeStamp - 1] && row[PARAMS.sheets.review.colCheck - 1]).length;
-
     if (numRequests == 0) ss.toast('No pending approved requests!', PARAMS.toastTitle);
     else {
 
@@ -43,19 +42,17 @@ function processRequests() {
             .find(item => item[PARAMS.sheets.settings.colFormItem - 1] == chatSpaceItem)?.[PARAMS.sheets.settings.colFormSpaceName - 1];
           const chatSpaceId = spaceTableValues
             .find(chatSpace => chatSpace[PARAMS.sheets.settings.colSpaceName - 1] == chatSpaceName)?.[PARAMS.sheets.settings.colSpaceId - 1];
+
+          // Do we have a match?
           if (!chatSpaceId) array[index][PARAMS.sheets.review.colLog - 1] = `Can't find space!`;
           else {
 
-            let userId;
             try {
 
               // Gets user's id using the Directory API
-              userId = AdminDirectory.Users.get(email, { projection: 'BASIC', viewType: 'domain_public' }).id;
-              
-              console.info(userId);
+              const userId = AdminDirectory.Users.get(email, { projection: 'BASIC', viewType: 'domain_public' }).id;
 
-              // Adds user to space
-
+              // Adds user to space (no previous membership needed)
               const response = UrlFetchApp.fetch(
                 `${PARAMS.endpoints.spacesMembersCreate}/${chatSpaceId}/members`,
                 {
@@ -63,35 +60,35 @@ function processRequests() {
                   muteHttpExceptions: true,
                   headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
                   contentType: 'application/json',
-                  payload: JSON.stringify({ member: { name: `users/${userId}`, type: 'HUMAN' } })                }
+                  payload: JSON.stringify({ member: { name: `users/${userId}`, type: 'HUMAN' } })
+                }
               );
-              
-              console.info(response.getResponseCode(), response.getContentText());
-              
+
+              // Won't throw an error if user was already a member (unlike AdminDirectory.Members.insert!)
               if (response.getResponseCode() != 200) array[index][PARAMS.sheets.review.colLog - 1] = `Can't add user to space!`;
               else {
                 // Unchecks request and write timestamp in log
                 usersAdded++;
-                array[index][PARAMS.sheets.review.colCheck -1] = false;
-                array[index][PARAMS.sheets.review.colLog - 1] =  Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
+                array[index][PARAMS.sheets.review.colCheck - 1] = false;
+                array[index][PARAMS.sheets.review.colLog - 1] = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
               }
 
             } catch (e) {
-              // This can fail is requesting user is external to the domain
-              console.info('User not found!');
+              // This will happen if requesting user is external to the domain
               array[index][PARAMS.sheets.review.colLog - 1] = `Can't find user!`;
             }
 
           }
+
         }
 
       });
 
-      // Update access grating checkboxes in sheet
+      // Writes back the value of all checkboxes
       s.getRange(PARAMS.sheets.review.dataRow, PARAMS.sheets.review.colCheck, requests.length, 1)
         .setValues(requests.map(request => [request[PARAMS.sheets.review.colCheck - 1]]));
 
-      // Write log to sheet, could be done in one step together with checkboxes, but columns could not be next to each other
+      // Writes log column to sheet, could be done in one step together with checkboxes, but columns could not be next to each other
       s.getRange(PARAMS.sheets.review.dataRow, PARAMS.sheets.review.colLog, requests.length, 1)
         .setValues(requests.map(request => [request[PARAMS.sheets.review.colLog - 1]]));
 

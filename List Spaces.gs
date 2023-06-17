@@ -5,10 +5,10 @@
 function listSpaces() {
 
   // Prevents concurrent runs
-  const lock = LockService.getScriptLock()
+  const lock = LockService.getScriptLock();
   if (lock.tryLock(0)) {
 
-    const ss = SpreadsheetApp.getActive()
+    const ss = SpreadsheetApp.getActive();
     const s = ss.getSheetByName(PARAMS.sheets.settings.name);
     let result = [];
     let pageToken;
@@ -21,41 +21,47 @@ function listSpaces() {
     // Pings the Chat API to get spaces using API
     do {
       const response = UrlFetchApp.fetch(
+        // Double quotes (") are not valid in the URI, either replace with %22 or use encodeURI()
         encodeURI(`${PARAMS.endpoints.listSpaces}?filter=spaceType="SPACE"${pageToken ? `&pageToken=${pageToken}` : ''}`),
         {
           method: 'GET',
           muteHttpExceptions: true,
           headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() }
         }
-      )
+      );
       if (response.getResponseCode() == 200) {
         const payload = JSON.parse(response.getContentText());
         result = result.concat(payload.spaces);
         pageToken = payload.nextPageToken;
-      } else return response.getResponseCode();
+      } else ss.toast(`Error ${response.getResponseCode()}.`, PARAMS.toastTitle);
     } while (pageToken);
 
-    // Gets only desired fields from reponse using nested destructuring and sort spaces by name
+    // Gets only the desired fields from the result array using nested destructuring and sorts spaces by name
     const spacesData = result.map(space => {
       const { name, displayName, spaceDetails: { description = 'No description available' } = '' } = space;
       return [
         displayName,
-        description.length > PARAMS.chatSpaceDescriptionMaxLength -3 ? `${description.slice(0, 60)}...` : description,
+        description.length > PARAMS.chatSpaceDescriptionMaxLength - 3 ? `${description.slice(0, 60)}...` : description,
+        // Space ID, actually
         name
       ];
+    // Sorts by displayName
     }).sort((space1, space2) => space1[0].localeCompare(space2[0]));
 
-    // Writes data in table of spaces
-    s.getRange(PARAMS.sheets.settings.spaceTable)
-      .clearContent()
-      .offset(0, 0, spacesData.length, spacesData[0].length).setValues(spacesData);
+    // Writes data, if any, in table (directory) of spaces
+    if (spacesData.length > 0) {
+      s.getRange(PARAMS.sheets.settings.spaceTable)
+        .clearContent()
+        .offset(0, 0, spacesData.length, spacesData[0].length).setValues(spacesData);
 
-    // Signals end of process
-    ss.toast('Done!', PARAMS.toastTitle);
+      // Signals successful end of process
+      ss.toast('Done!', PARAMS.toastTitle);
+    }
+
+    // Restores the green indicator circle
     s.getRange(PARAMS.buttons.leds.reload).setValue(PARAMS.buttons.status.on);
-
     // Unnecessary, but recommended
-    SpreadsheetApp.flush();
+    SpreadsheetApp.flush();    
     lock.releaseLock();
 
   }
