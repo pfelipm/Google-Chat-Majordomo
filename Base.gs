@@ -57,6 +57,6 @@ function m_about() {
   const panel = HtmlService.createTemplateFromFile('About');
   panel.version = PARAMS.version;
   panel.appName = PARAMS.appName;
-  SpreadsheetApp.getUi().showModalDialog(panel.evaluate().setWidth(450).setHeight(350), `💡 What is ${PARAMS.appName}?`);
+  SpreadsheetApp.getUi().showModalDialog(panel.evaluate().setWidth(470).setHeight(350), `💡 What is ${PARAMS.appName}?`);
 
 }
