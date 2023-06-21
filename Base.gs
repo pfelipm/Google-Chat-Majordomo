@@ -12,7 +12,7 @@
  */
 
 const PARAMS = {
-  version: 'Version: 1.0 (june 2023)',
+  version: 'Version 1.0 (june 2023)',
   appName: 'Google Chat Majordomo',
   icon: '💢',
   toastTitle: '💢 Chat Majordomo says:',
@@ -57,6 +57,6 @@ function m_about() {
   const panel = HtmlService.createTemplateFromFile('About');
   panel.version = PARAMS.version;
   panel.appName = PARAMS.appName;
-  SpreadsheetApp.getUi().showModalDialog(panel.evaluate().setWidth(450).setHeight(320), `💡 What is ${PARAMS.appName}?`);
+  SpreadsheetApp.getUi().showModalDialog(panel.evaluate().setWidth(450).setHeight(350), `💡 What is ${PARAMS.appName}?`);
 
 }
