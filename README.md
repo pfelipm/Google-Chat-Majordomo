@@ -1,4 +1,5 @@
 ![Created with - Google Apps Script](https://img.shields.io/static/v1?label=Created+with&message=Google+Apps+Script&color=blue)
+![Banner](https://docs.google.com/drawings/d/12cMP4NPdES7p33yro7QX-fTgRwN4Dd09noCExpEyoMM/export/png)
 # Google Chat Majordomo
 This tool implements a workflow that allows administrators to review and approve requests for membership in different Google Chat spaces, collected with Google Forms.
 
