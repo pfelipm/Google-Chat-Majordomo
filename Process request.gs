@@ -52,7 +52,7 @@ function processRequests() {
               // Gets user's id using the Directory API
               const userId = AdminDirectory.Users.get(email, { projection: 'BASIC', viewType: 'domain_public' }).id;
 
-              // Adds user to space (no previous membership needed)
+              // Adds user to space (no previous membership check needed)
               const response = UrlFetchApp.fetch(
                 `${PARAMS.endpoints.spacesMembersCreate}/${chatSpaceId}/members`,
                 {
