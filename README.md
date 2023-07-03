@@ -5,4 +5,4 @@ This tool implements a workflow that allows administrators to review and approve
 
 ![Workflow diagram](https://docs.google.com/drawings/d/130nJ2dHCMbqYNtaG0ir1ziyEFGLvcI0WKDvXHKi_1bs/export/png)
 
-See the full post [here](https://pablofelip.online/adding-users-chat-apps-script/).
+Check the full post [here](https://pablofelip.online/adding-users-chat-apps-script/).
